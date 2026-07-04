@@ -60,7 +60,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     p.add_argument("--whisper-model", default="small",
                    help="Modello Whisper (tiny/base/small/medium/large-v3). Default: small.")
     p.add_argument("--use-llm", action="store_true",
-                   help="Usa la modalità LLM-ready del selector (per l'MVP delega alle euristiche).")
+                   help="Usa la modalità LLM del selector (flusso Claude-in-the-loop).")
+    p.add_argument("--llm-decisions", metavar="PATH",
+                   help="JSON con le decisioni prodotte da un LLM (usato con --use-llm).")
     p.add_argument("--dry-run", action="store_true",
                    help="Genera solo data/edit_plan.json senza tagliare il video.")
     p.add_argument("--keep-temp", action="store_true",
@@ -117,12 +119,28 @@ def main(argv: list[str]) -> int:
     utils.write_json(DATA_DIR / "scenes.json", scenes)
 
     # --- 4. selezione --------------------------------------------------------
-    decisions = scene_selector.select_scenes(
-        user_request=args.request,
-        scenes=scenes,
-        target_duration=args.target_duration,
-        use_llm=args.use_llm,
-    )
+    llm_request_path = DATA_DIR / "llm_request.json"
+    try:
+        decisions = scene_selector.select_scenes(
+            user_request=args.request,
+            scenes=scenes,
+            target_duration=args.target_duration,
+            use_llm=args.use_llm,
+            llm_decisions_path=Path(args.llm_decisions) if args.llm_decisions else None,
+            llm_request_path=llm_request_path,
+        )
+    except scene_selector.LLMInputRequired as e:
+        print(
+            "\n[LLM] Richiesta di selezione esportata in:\n"
+            f"      {e.request_path}\n"
+            "Passi successivi:\n"
+            "  1. Un LLM (o Claude) legge quel file e produce le decisioni in JSON\n"
+            "     nel formato [{\"scene_id\", \"reason\", \"keep\", \"priority\"}].\n"
+            "  2. Salva le decisioni, es. in data/llm_decisions.json\n"
+            "  3. Rilancia lo stesso comando aggiungendo:\n"
+            "       --llm-decisions data/llm_decisions.json\n"
+        )
+        return 0
 
     # --- 5. edit plan --------------------------------------------------------
     plan = edit_plan_mod.build_edit_plan(

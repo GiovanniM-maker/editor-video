@@ -138,9 +138,33 @@ Il modulo `src/scene_selector.py` ha **due modalità ben separate**:
   **multilingua IT/EN** (es. *combattimento ↔ fight ↔ battle ↔ azione*), assegna
   a ogni scena `keep`/`priority`/`reason` e rispetta `--target-duration`.
   Per i recap sceglie scene **distribuite** lungo tutto l'episodio (deterministico).
-- **LLM-ready (`--use-llm`):** funzione `select_scenes_llm(user_request, scenes)`
-  con lo stesso contratto di input/output, pronta per collegare in futuro
-  Claude/OpenAI/un LLM locale. Per l'MVP delega alle euristiche.
+- **LLM (`--use-llm`):** modalità "Claude-in-the-loop", senza API key. Il tool
+  esporta la richiesta e un LLM produce le decisioni; poi le reimporti. In futuro
+  basta sostituire l'export con una chiamata API (l'helper `build_llm_prompt` è già
+  pronto) mantenendo lo stesso contratto di input/output.
+
+### Modalità LLM "Claude-in-the-loop"
+
+Utile in fase di test per far selezionare le scene a un LLM reale senza scrivere
+codice di integrazione né configurare API key:
+
+```bash
+# 1) Esporta la richiesta di selezione (scrive data/llm_request.json)
+python main.py --video input/episode.mp4 --scenes input/scenes.txt \
+    --request "combattimenti + finale emozionale" --target-duration 45 --use-llm
+
+# 2) Dai data/llm_request.json a un LLM (o a Claude in chat). L'LLM risponde con
+#    un array JSON [{"scene_id", "reason", "keep", "priority"}] che salvi in
+#    data/llm_decisions.json
+
+# 3) Rilancia lo stesso comando con le decisioni: il tool le valida e monta l'edit
+python main.py --video input/episode.mp4 --scenes input/scenes.txt \
+    --request "combattimenti + finale emozionale" --target-duration 45 \
+    --use-llm --llm-decisions data/llm_decisions.json
+```
+
+Le decisioni vengono validate (scene_id inesistenti scartati, scene non citate
+trattate come `keep=false`), così un JSON imperfetto non rompe la pipeline.
 
 ---
 

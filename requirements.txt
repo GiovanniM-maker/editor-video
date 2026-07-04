@@ -1,0 +1,9 @@
+# Anime Scene Cutter MVP — dipendenze Python
+#
+# ffmpeg / ffprobe NON sono pacchetti pip: vanno installati a parte
+# (vedi README, sezione "Installazione ffmpeg").
+#
+# faster-whisper porta con sé CTranslate2. Su CPU l'MVP usa compute_type=int8.
+# Il modello Whisper viene scaricato al primo utilizzo e messo in cache locale.
+
+faster-whisper==1.0.3

@@ -1,0 +1,9 @@
+# Esempio di scenes.txt CON timestamp.
+# Ogni riga: HH:MM:SS - descrizione della scena.
+# Se sono presenti i timestamp, definiscono i confini delle scene.
+# Se un file NON contiene timestamp, viene usato solo come contesto.
+
+00:00:10 - Il protagonista entra nel dungeon.
+00:00:25 - Inizia il combattimento contro i mostri.
+00:00:40 - Dialogo importante con il gruppo dopo la battaglia.
+00:00:55 - Decidono di scendere più in profondità.

@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Artefatti generati (teniamo tracciate solo le cartelle vuote via .gitkeep)
+input/*
+!input/.gitkeep
+data/*
+!data/.gitkeep
+output/*
+!output/.gitkeep
+output/clips/*
+!output/clips/.gitkeep
+
+# File multimediali di lavoro
+*.mp4
+*.wav
+*.mkv
+*.mov
+
+# OS
+.DS_Store

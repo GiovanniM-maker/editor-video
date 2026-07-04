@@ -1,0 +1,14 @@
+# Esempio di transcript.txt SENZA timestamp.
+# In questo formato il testo viene usato solo come contesto semantico:
+# la timeline temporale viene comunque generata da Whisper.
+
+I thought I was the weakest hunter.
+Then the dungeon changed everything.
+The monsters attacked without warning and I drew my sword.
+After the battle, I spoke with my party about what happened.
+We decided to go deeper into the dungeon together.
+
+# --- In alternativa, un transcript CON timestamp (usato come timeline) ---
+# 00:00:12 I thought I was the weakest hunter.
+# 00:00:19 Then the dungeon changed everything.
+# 00:00:31 The monsters attacked and I drew my sword.

@@ -79,6 +79,8 @@ python main.py \
 | `--target-duration`   | ❌     | Durata target dell'edit, in secondi. |
 | `--language`          | ❌     | Lingua Whisper (`it`, `en`, …). Default `auto`. |
 | `--whisper-model`     | ❌     | `tiny`/`base`/`small`/`medium`/`large-v3`. Default `small`. |
+| `--device`            | ❌     | `auto` (GPU se presente) / `cpu` / `cuda`. Default `auto`. |
+| `--compute-type`      | ❌     | Precisione CTranslate2 (`auto`/`int8`/`float16`/…). Default `auto`. |
 | `--use-llm`           | ❌     | Attiva la modalità LLM-ready del selector (per l'MVP delega alle euristiche). |
 | `--dry-run`           | ❌     | Genera solo `data/edit_plan.json`, senza tagliare il video. |
 | `--keep-temp`         | ❌     | Non cancella le clip temporanee e il WAV. |
@@ -176,6 +178,23 @@ trattate come `keep=false`), così un JSON imperfetto non rompe la pipeline.
 - Ogni clip viene **ri-encodata** (H.264/AAC) per un output affidabile: è più
   lento del semplice copy, ma evita frame neri e desync audio/video.
 - Whisper su episodi lunghi può richiedere **diversi minuti** su CPU.
+
+## Accelerazione GPU (Whisper più veloce)
+
+Di default `--device auto` usa la GPU se disponibile, altrimenti la CPU. Su una
+macchina con GPU NVIDIA la trascrizione è molto più rapida:
+
+```bash
+python main.py --video input/episode.mp4 --request "recap 60s" \
+    --device cuda --compute-type float16
+```
+
+Se la GPU non è realmente utilizzabile (driver/CUDA mancanti), il tool ripiega
+automaticamente su CPU (`int8`) senza interrompersi. Su CPU l'MVP resta
+utilizzabile ma più lento sui video lunghi.
+
+> Nota: l'accelerazione CUDA richiede driver NVIDIA e le librerie cuDNN/cuBLAS
+> compatibili con CTranslate2 installate sul sistema.
 
 ## Possibili evoluzioni
 

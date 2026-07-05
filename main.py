@@ -59,6 +59,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
                    help="Lingua per Whisper (es. it, en). Default: auto.")
     p.add_argument("--whisper-model", default="small",
                    help="Modello Whisper (tiny/base/small/medium/large-v3). Default: small.")
+    p.add_argument("--device", default="auto", choices=["auto", "cpu", "cuda"],
+                   help="Device per Whisper: auto (GPU se presente), cpu, cuda. Default: auto.")
+    p.add_argument("--compute-type", default="auto",
+                   help="Precisione CTranslate2 (auto/int8/int8_float16/float16/float32). Default: auto.")
     p.add_argument("--use-llm", action="store_true",
                    help="Usa la modalità LLM del selector (flusso Claude-in-the-loop).")
     p.add_argument("--llm-decisions", metavar="PATH",
@@ -207,6 +211,8 @@ def _obtain_segments(args, video_path: Path, info) -> list[dict]:
         wav_path,
         model_name=args.whisper_model,
         language=args.language,
+        device=args.device,
+        compute_type=args.compute_type,
     )
 
     if not args.keep_temp and wav_path.exists():
